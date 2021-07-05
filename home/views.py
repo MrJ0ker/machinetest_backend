@@ -9,8 +9,19 @@ from django.core.mail import send_mail
 import bitly_api
 
 
-# Create your views here.
 class AddInvoice(APIView):
+    ## get method to find all the valid invoices to send to frontend from the invoice_master table
+    def get(self,request):
+        try:
+            
+            ins_invoice = InvoiceMaster.objects.filter(int_status = 0).values('vchr_cust_name','vchr_email','dat_created','dbl_amt','vchr_invoice_id')
+            if ins_invoice:
+                return Response({'status':1,'invoice_data':ins_invoice})
+            
+        except Exception as e:
+            return Response({'status':0,'message':str(e)})
+        
+    ## post method to add invoice to the invoice_master table
     def post(self,request):
         try:
             vchr_invoice_id =request.data.get('strInvoiceId')
@@ -25,11 +36,14 @@ class AddInvoice(APIView):
                                                        dat_created = datetime.now())
             
             if ins_invoice:
-                return Response({'status':1,'message':"success"})
+                ## code to list all the invoices to be paid
+                ins_invoices = InvoiceMaster.objects.filter(int_status = 0).values('vchr_cust_name','vchr_email','dat_created','dbl_amt','vchr_invoice_id')
+                return Response({'status':1,'message':"success",'invoice_data':ins_invoices})
             else:
                 return Response({'status':0,'message':"failed"})
         except Exception as e:
             return Response({'status':0,'message':str(e)})
+## a class to find the respective invoice using a unique id passed to respective customer from the invoice_master table
 class Payment(APIView):
     def get(self,request,id):
         ins_invoice = InvoiceMaster.objects.filter(pk_bint_id = id,int_status=0).values('pk_bint_id','vchr_cust_name','vchr_email','dbl_amt','vchr_invoice_id').first()
@@ -37,27 +51,30 @@ class Payment(APIView):
             return Response({'status':1,'message':"success",'data':ins_invoice})
         else:
             return Response({'status':0,'message':'No data'})
-            
+        
+ ## A class to mark or update the invoice which have been paid in the invoice_master table           
 class SavePayment(APIView):
     def post(self,request):
         try:
             int_id = request.data.get('intId')
             if int_id:
-                InvoiceMaster.objects.filter(pk_bint_id = int_id).update(int_status = 1)
+                InvoiceMaster.objects.filter(pk_bint_id = int_id).update(int_status = 1,dat_action=datetime.now())
                 return Response({'status':1,'message':"Updated"})
         except Exception as e:
             return Response({'status':0,'message':str(e)})
             
-    
+## A class for sending mail to the customers about their payment details and providing unique payment links through email
 class SendMail(APIView):
     def get(self,request):
-        bitly_token = '0fdc40983521b163c8307ee73b47d25526d0e8b1'
+        ### bitly api to shorten payment urls
+        bitly_token = '##provide bitly api token here ##'
         connection = bitly_api.Connection(access_token = bitly_token) 
         
         ins_invoice = InvoiceMaster.objects.filter(int_status =0 ).values('pk_bint_id','vchr_cust_name','vchr_email','dbl_amt','vchr_invoice_id')
         if not ins_invoice:
             return Response({'status':0,'message':"No data"})
         else:
+            ## code to send mail using django's send_mail function where message and recipient list is gathered from the invoice_master table. A unique payment link is also attached in the mail.
             for ins_data in ins_invoice:
                 vchr_url = 'http://127.0.0.1:4200/payment/'+str(ins_data['pk_bint_id'])
                 vchr_short_url = connection.shorten(vchr_url)['url']

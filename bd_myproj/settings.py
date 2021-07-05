@@ -61,31 +61,7 @@ JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
 }
 
-# CORS_ORIGIN_WHITELIST = (
-#     'google.com',
-#     'hostname.example.com',
-#     'localhost:4201',
-#     'localhost:4200',
-#     'localhost:4000',
-#     '127.0.0.1:4200',
-#     '127.0.0.1:8002',
-#     '127.0.0.1:1234',
-#     '192.168.0.13:4321',
-#     '192.168.0.11:2000',
-#     '192.168.0.17:4200',
-#     '192.168.0.13',
-#     'localhost',
-#     '192.168.0.25:5000',
-#     '192.168.0.21:8000',
-#     '192.168.0.25:4200',
-#     '192.168.0.25:80',
-#     '192.168.0.25'
-#     '192.168.0.25:4200',
-#     'localhost:2000',
-#     'localhost:8000',
-#     '192.168.0.3:5555',
 
-# )
 CORS_ALLOW_HEADERS = default_headers + (
     'version',
 )
@@ -127,7 +103,7 @@ WSGI_APPLICATION = 'bd_myproj.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 if DEBUG:
-    # CHAT_URL = "http://52.172.210.209:2021/"
+    ## configure the database below
     DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.postgresql',
@@ -135,7 +111,6 @@ if DEBUG:
                 'USER': 'admin',
                 'PASSWORD':'admin@123',
                 'HOST': '127.0.0.1',
-                # 'HOST':'192.168.0.114',
                 'PORT': '5432',
             }
         }
@@ -179,10 +154,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+## configure the below part with respective email address and password
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'chriztophermoriarity@gmail.com'
-EMAIL_HOST_PASSWORD = '9633832200'
+EMAIL_HOST_USER = '##provide email id here##'
+EMAIL_HOST_PASSWORD = '##email password ##'
 EMAIL_PORT = 587
