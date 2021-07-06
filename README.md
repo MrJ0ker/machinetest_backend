@@ -1,5 +1,5 @@
 # machinetest_backend 
-clone the master branch to local
+clone from the 'master' branch to local
 create virtual environment using req.txt
 provide email and password in the project settings.py
 
